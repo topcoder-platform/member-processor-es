@@ -1,6 +1,7 @@
 version: '3'
 services:
   member-processor-es:
+    image: member-processor-es:latest
     build:
       context: ../
       dockerfile: docker/Dockerfile
