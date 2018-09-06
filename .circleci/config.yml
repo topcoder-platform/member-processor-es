@@ -30,7 +30,7 @@ jobs:
             git clone --branch master https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deply_v4.2.sh .
             ./master_deply_v4.2.sh -d ECS -e DEV -t $CIRCLE_BUILD_NUM -s member-processor-es
-    
+
   "build-prod":
     docker:
       - image: docker:18.06.0-ce-git
@@ -50,7 +50,7 @@ jobs:
             sudo chmod +x /usr/local/bin/ecs-cli
       - run:
           name: Executing build.
-          command: 
+          command: |
              chmod +x build.sh
              ./build.sh PROD
       - deploy:
@@ -58,7 +58,7 @@ jobs:
           command: |
             git clone --branch master https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deply_v4.2.sh .
-            ./master_deply_v4.2.sh -d ECS -e PROD -t $CIRCLE_BUILD_NUM -s member-processor-es-prod 
+            ./master_deply_v4.2.sh -d ECS -e PROD -t $CIRCLE_BUILD_NUM -s member-processor-es-prod
 workflows:
   version: 2
   build:
