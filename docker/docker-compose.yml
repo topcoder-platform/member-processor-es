@@ -1,10 +1,10 @@
 version: '3'
 services:
   member-processor-es:
+    image: member-processor-es:latest
     build:
       context: ../
       dockerfile: docker/Dockerfile
     env_file:
       - api.env
-    command: npm start
     network_mode: "host"

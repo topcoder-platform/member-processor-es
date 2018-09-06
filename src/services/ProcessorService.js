@@ -123,7 +123,7 @@ createTrait.schema = {
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
       userHandle: Joi.string().required(),
-      traitId: Joi.number().integer().min(1).required()
+      traitId: Joi.string().required()
     }).unknown(true).required()
   }).required()
 }
