@@ -25,6 +25,7 @@ jobs:
             chmod +x build.sh
             ./build.sh DEV
       - deploy:
+          name: Running Masterscript.
           command: |
             git clone --branch master https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deply_v4.2.sh .
@@ -53,10 +54,11 @@ jobs:
              chmod +x build.sh
              ./build.sh PROD
       - deploy:
+          name: Running Masterscript.
           command: |
             git clone --branch master https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deply_v4.2.sh .
-            ./master_deply_v4.2.sh -d ECS -e PROD -t $CIRCLE_BUILD_NUM -s member-processor-es  
+            ./master_deply_v4.2.sh -d ECS -e PROD -t $CIRCLE_BUILD_NUM -s member-processor-es-prod 
 workflows:
   version: 2
   build:
@@ -69,4 +71,4 @@ workflows:
       - "build-prod":
           filters:
             branches:
-              only: mas
+              only: master
