@@ -11,6 +11,21 @@ const { PROFILE_RESOURCE, TRAIT_RESOURCE, PHOTO_RESOURCE } = require('../constan
 const client = helper.getESClient()
 
 /**
+ * Convert payload.
+ * @param {Object} payload the payload
+ * @return {Object} the converted payload
+ */
+function convertPayload (payload) {
+  if (payload.createdAt && _.isNumber(payload.createdAt)) {
+    payload.createdAt = new Date(payload.createdAt).toISOString()
+  }
+  if (payload.updatedAt && _.isNumber(payload.updatedAt)) {
+    payload.updatedAt = new Date(payload.updatedAt).toISOString()
+  }
+  return payload
+}
+
+/**
  * Create message in Elasticsearch.
  * @param {String} id the Elasticsearch record id
  * @param {Object} message the message
@@ -20,7 +35,7 @@ function * create (id, message) {
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id,
-    body: message.payload
+    body: convertPayload(message.payload)
   })
 }
 
@@ -30,11 +45,12 @@ function * create (id, message) {
  * @param {Object} message the message
  */
 function * update (id, message) {
+  convertPayload(message.payload)
   yield client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id,
-    body: { doc: message.payload }
+    body: { upsert: message.payload, doc: message.payload }
   })
 }
 

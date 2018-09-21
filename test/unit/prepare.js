@@ -67,12 +67,8 @@ prepare(function (done) {
     .post(`${profileId}/_update`)
     .query(true)
     .reply(() => {
-      if (profile) {
-        profile = testHelper.mergeObj(updateProfileMessage.payload, { resource: PROFILE_RESOURCE })
-        return [200]
-      } else {
-        return [404, '']
-      }
+      profile = testHelper.mergeObj(updateProfileMessage.payload, { resource: PROFILE_RESOURCE })
+      return [200]
     })
     .delete(profileId)
     .query(true)
@@ -106,12 +102,8 @@ prepare(function (done) {
     .post(`${traitId}/_update`)
     .query(true)
     .reply(() => {
-      if (trait) {
-        trait = testHelper.mergeObj(updateTraitMessage.payload, { resource: TRAIT_RESOURCE })
-        return [200, trait]
-      } else {
-        return [404, '']
-      }
+      trait = testHelper.mergeObj(updateTraitMessage.payload, { resource: TRAIT_RESOURCE })
+      return [200, trait]
     })
     .delete(traitId)
     .query(true)
@@ -145,12 +137,8 @@ prepare(function (done) {
     .post(`${photoId}/_update`)
     .query(true)
     .reply(() => {
-      if (photo) {
-        photo = testHelper.mergeObj(updatePhotoMessage.payload, { resource: PHOTO_RESOURCE })
-        return [200, photo]
-      } else {
-        return [404, '']
-      }
+      photo = testHelper.mergeObj(updatePhotoMessage.payload, { resource: PHOTO_RESOURCE })
+      return [200, photo]
     })
     .get(() => true)
     .query(true)

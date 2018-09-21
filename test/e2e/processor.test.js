@@ -68,23 +68,6 @@ describe('TC Member Processor Tests', () => {
       .catch(done)
   }).timeout(TEST_TIMEOUT_MS)
 
-  it('update profile message - not found', (done) => {
-    const message = _.cloneDeep(updateProfileMessage)
-    message.payload.userId = 12345
-    co(function * () {
-      try {
-        yield ProcessorService.updateProfile(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.statusCode).to.equal(404)
-        return
-      }
-      throw new Error('There should be not found error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
   it('delete profile message', (done) => {
     co(function * () {
       yield ProcessorService.removeProfile(deleteProfileMessage)
@@ -299,23 +282,6 @@ describe('TC Member Processor Tests', () => {
       yield ProcessorService.updateTrait(updateTraitMessage)
       const data = yield testHelper.getESData(traitId)
       testHelper.expectObject(data, testHelper.mergeObj(updateTraitMessage.payload, { resource: TRAIT_RESOURCE }))
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update trait message - not found', (done) => {
-    const message = _.cloneDeep(updateTraitMessage)
-    message.payload.traitId = 12345
-    co(function * () {
-      try {
-        yield ProcessorService.updateTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.statusCode).to.equal(404)
-        return
-      }
-      throw new Error('There should be not found error.')
     })
       .then(() => done())
       .catch(done)
@@ -586,23 +552,6 @@ describe('TC Member Processor Tests', () => {
       yield ProcessorService.updatePhoto(updatePhotoMessage)
       const data = yield testHelper.getESData(photoId)
       testHelper.expectObject(data, testHelper.mergeObj(updatePhotoMessage.payload, { resource: PHOTO_RESOURCE }))
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update photo message - not found', (done) => {
-    const message = _.cloneDeep(updatePhotoMessage)
-    message.payload.userId = 12345
-    co(function * () {
-      try {
-        yield ProcessorService.updatePhoto(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.statusCode).to.equal(404)
-        return
-      }
-      throw new Error('There should be not found error.')
     })
       .then(() => done())
       .catch(done)

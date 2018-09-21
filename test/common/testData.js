@@ -57,7 +57,7 @@ const createTraitMessage = {
   payload: {
     userId: 11,
     userHandle: 'handle',
-    traitId: 123,
+    traitId: '123',
     traitAttribute: 'value',
     created: '2018-02-03T00:00:00',
     createdBy: 'admin'
@@ -72,7 +72,7 @@ const updateTraitMessage = {
   payload: {
     userId: 11,
     userHandle: 'handle',
-    traitId: 123,
+    traitId: '123',
     traitAttribute: 'updated',
     created: '2018-02-03T00:00:00',
     createdBy: 'admin',
