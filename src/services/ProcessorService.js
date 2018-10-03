@@ -16,11 +16,15 @@ const client = helper.getESClient()
  * @return {Object} the converted payload
  */
 function convertPayload (payload) {
-  if (payload.createdAt && _.isNumber(payload.createdAt)) {
+  if (payload.createdAt) {
     payload.createdAt = new Date(payload.createdAt).toISOString()
+  } else {
+    payload.createdAt = new Date()
   }
-  if (payload.updatedAt && _.isNumber(payload.updatedAt)) {
+  if (payload.updatedAt) {
     payload.updatedAt = new Date(payload.updatedAt).toISOString()
+  } else {
+    payload.updatedAt = new Date()
   }
   return payload
 }
