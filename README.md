@@ -42,7 +42,7 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 - `http://kafka.apache.org/quickstart` contains details to setup and manage Kafka server,
   below provides details to setup Kafka server in Mac, Windows will use bat commands in bin/windows instead
 - download kafka at `https://www.apache.org/dyn/closer.cgi?path=/kafka/1.1.0/kafka_2.11-1.1.0.tgz`
-- extract out the doanlowded tgz file
+- extract out the downloaded tgz file
 - go to extracted directory kafka_2.11-0.11.0.1
 - start ZooKeeper server:
   `bin/zookeeper-server-start.sh config/zookeeper.properties`
@@ -209,7 +209,6 @@ info: The data is not found.
   `{ "topic": "member.action.profile.trait.update", "originator": "member-api", "timestamp": "2018-02-17T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "traitId": 123, "created": "2018-02-16T00:00:00", "createdBy": "admin", "updated": "2018-02-17T00:00:00", "updatedBy": "admin" } }`
 - delete trait:
   `{ "topic": "member.action.profile.trait.delete", "originator": "member-api", "timestamp": "2018-02-18T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "memberProfileTraitIds": [123, 456] } }`
-
 - create photo:
   `{ "topic": "member.action.profile.photo.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "photoURL": "http://test.com/123.png", "created": "2018-02-16T00:00:00", "createdBy": "admin" } }`
 - update photo:
@@ -224,5 +223,3 @@ info: The data is not found.
   ('profile' + userId) is used to identify profile,
   ('profile' + userId + 'photo') is used to identify photo,
   ('profile' + userId + 'trait' + traitId) is used to identify trait
-
-
