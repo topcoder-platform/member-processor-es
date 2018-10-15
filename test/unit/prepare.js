@@ -95,14 +95,14 @@ prepare(function (done) {
       if (trait) {
         return [409, '']
       } else {
-        trait = testHelper.mergeObj(createTraitMessage.payload, { resource: TRAIT_RESOURCE })
+        trait = createTraitMessage.payload
         return [200, trait]
       }
     })
     .post(`${traitId}/_update`)
     .query(true)
     .reply(() => {
-      trait = testHelper.mergeObj(updateTraitMessage.payload, { resource: TRAIT_RESOURCE })
+      trait = updateTraitMessage.payload
       return [200, trait]
     })
     .delete(traitId)
@@ -130,14 +130,14 @@ prepare(function (done) {
       if (photo) {
         return [409, '']
       } else {
-        photo = testHelper.mergeObj(createPhotoMessage.payload, { resource: PHOTO_RESOURCE })
+        photo = createPhotoMessage.payload
         return [200, photo]
       }
     })
     .post(`${photoId}/_update`)
     .query(true)
     .reply(() => {
-      photo = testHelper.mergeObj(updatePhotoMessage.payload, { resource: PHOTO_RESOURCE })
+      photo = updatePhotoMessage.payload
       return [200, photo]
     })
     .get(() => true)
