@@ -6,27 +6,33 @@ const Joi = require('joi')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
 const config = require('config')
-const { PROFILE_RESOURCE, TRAIT_RESOURCE, PHOTO_RESOURCE } = require('../constants')
 
 const client = helper.getESClient()
 
 /**
- * Convert payload.
- * @param {Object} payload the payload
- * @return {Object} the converted payload
+ * Get elastic search data.
+ * @param {String} id the Elastic search data id
+ * @returns {Object} Data from Elastic search
  */
-function convertPayload (payload) {
-  if (payload.createdAt) {
-    payload.createdAt = new Date(payload.createdAt).toISOString()
-  } else {
-    payload.createdAt = new Date()
-  }
-  if (payload.updatedAt) {
-    payload.updatedAt = new Date(payload.updatedAt).toISOString()
-  } else {
-    payload.updatedAt = new Date()
-  }
-  return payload
+function * getESData (id) {
+  return yield client.getSource({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id
+  })
+}
+
+/**
+ * Get message in Elasticsearch.
+ * @param {String} id the Elasticsearch record id
+ * @param {Object} message the message
+ */
+function * get (id) {
+  return client.get({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id
+  })
 }
 
 /**
@@ -39,7 +45,21 @@ function * create (id, message) {
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id,
-    body: convertPayload(message.payload)
+    body: message
+  })
+}
+
+/**
+ * Create message in Elasticsearch.
+ * @param {String} id the Elasticsearch record id
+ * @param {Object} message the message
+ */
+function * index (id, message) {
+  yield client.index({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id,
+    body: message
   })
 }
 
@@ -49,12 +69,11 @@ function * create (id, message) {
  * @param {Object} message the message
  */
 function * update (id, message) {
-  convertPayload(message.payload)
   yield client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id,
-    body: { upsert: message.payload, doc: message.payload }
+    body: { doc: message }
   })
 }
 
@@ -76,8 +95,7 @@ function * remove (ids) {
  * @param {Object} message the message
  */
 function * createProfile (message) {
-  message.payload.resource = PROFILE_RESOURCE
-  yield create(`${PROFILE_RESOURCE}${message.payload.userId}`, message)
+  yield create(message.payload.userId, message.payload)
 }
 
 createProfile.schema = {
@@ -87,8 +105,7 @@ createProfile.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required()
+      userId: Joi.number().integer().min(1).required()
     }).unknown(true).required()
   }).required()
 }
@@ -98,8 +115,7 @@ createProfile.schema = {
  * @param {Object} message the message
  */
 function * updateProfile (message) {
-  message.payload.resource = PROFILE_RESOURCE
-  yield update(`${PROFILE_RESOURCE}${message.payload.userId}`, message)
+  yield update(message.payload.userId, message.payload)
 }
 
 updateProfile.schema = createProfile.schema
@@ -109,7 +125,7 @@ updateProfile.schema = createProfile.schema
  * @param {Object} message the message
  */
 function * removeProfile (message) {
-  yield remove([`${PROFILE_RESOURCE}${message.payload.userId}`])
+  yield remove([message.payload.userId])
 }
 
 removeProfile.schema = {
@@ -119,8 +135,7 @@ removeProfile.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required()
+      userId: Joi.number().integer().min(1).required()
     }).required()
   }).required()
 }
@@ -130,8 +145,36 @@ removeProfile.schema = {
  * @param {Object} message the message
  */
 function * createTrait (message) {
-  message.payload.resource = TRAIT_RESOURCE
-  yield create(`${PROFILE_RESOURCE}${message.payload.userId}${TRAIT_RESOURCE}${message.payload.traitId}`, message)
+  let source = {};
+  try {
+    source = yield getESData(message.payload.userId)
+  } catch (e) {
+    console.log(JSON.stringify(e))
+    source = {}
+  }
+  if (!source.traits) {
+      source.traits = []
+  }
+  const traits = message.payload.traits
+  delete message.payload.traits
+  source = Object.assign(source, message.payload);
+  var basicInfo = false
+  for (var value of traits) {
+    if (value.traitId == 'basic_info') {
+      basicInfo = true
+    }
+    var foundIndex = source.traits.findIndex(x => x.traitId == value.traitId)
+    if (foundIndex >= 0) {
+      source.traits[foundIndex] = value
+    } else {
+      source.traits.push(value)
+    }
+  }  
+  if (basicInfo) {
+    yield index(message.payload.userId, source)
+  } else {
+    yield update(message.payload.userId, {traits: source.traits, updatedAt: message.payload.updatedAt, updatedBy: message.payload.update})
+  }
 }
 
 createTrait.schema = {
@@ -142,8 +185,8 @@ createTrait.schema = {
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required(),
-      traitId: Joi.string().required()
+      updatedAt: Joi.string().required(),
+      updatedBy: Joi.string().required()
     }).unknown(true).required()
   }).required()
 }
@@ -153,8 +196,32 @@ createTrait.schema = {
  * @param {Object} message the message
  */
 function * updateTrait (message) {
-  message.payload.resource = TRAIT_RESOURCE
-  yield update(`${PROFILE_RESOURCE}${message.payload.userId}${TRAIT_RESOURCE}${message.payload.traitId}`, message)
+  let source = {};
+  try {
+    source = yield getESData(message.payload.userId)
+  } catch (e) {
+    console.log(JSON.stringify(e))
+    source = {}
+  }
+  if (!source.traits) {
+      source.traits = []
+  }
+  const traits = message.payload.traits
+  delete message.payload.traits
+  source = Object.assign(source, message.payload);
+  var basicInfo = false
+  for (var value of traits) {
+    if (value.traitId == 'basic_info') {
+      basicInfo = true
+    }
+    var foundIndex = source.traits.findIndex(x => x.traitId == value.traitId)
+    source.traits[foundIndex] = value;
+  }
+  if (basicInfo) {
+    yield update(message.payload.userId, source)
+  } else {
+    yield update(message.payload.userId, {traits: source.traits, updatedAt: message.payload.updatedAt, updatedBy: message.payload.update})
+  }
 }
 
 updateTrait.schema = createTrait.schema
@@ -164,8 +231,17 @@ updateTrait.schema = createTrait.schema
  * @param {Object} message the message
  */
 function * removeTrait (message) {
-  yield remove(_.map(message.payload.memberProfileTraitIds, (traitId) =>
-    `${PROFILE_RESOURCE}${message.payload.userId}${TRAIT_RESOURCE}${traitId}`))
+  const source = yield getESData(message.payload.userId)
+  if (!source.traits || source.traits.length == 0) {
+    return
+  }
+  source.traits = source.traits.filter(function(el) {
+    return message.payload.memberProfileTraitIds.findIndex(x => x == el.traitId) < 0
+  })
+  if (message.payload.memberProfileTraitIds.length == 0) {
+    source.traits = []
+  }
+  yield update(message.payload.userId, {traits: source.traits, updatedAt: message.payload.updatedAt, updatedBy: message.payload.update})
 }
 
 removeTrait.schema = {
@@ -176,8 +252,9 @@ removeTrait.schema = {
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required(),
-      memberProfileTraitIds: Joi.array().items(Joi.number().integer().min(1).required()).min(1).required()
+      memberProfileTraitIds: Joi.array().required(),
+      updatedAt: Joi.string().required(),
+      updatedBy: Joi.string().required()
     }).required()
   }).required()
 }
@@ -187,8 +264,7 @@ removeTrait.schema = {
  * @param {Object} message the message
  */
 function * createPhoto (message) {
-  message.payload.resource = PHOTO_RESOURCE
-  yield create(`${PROFILE_RESOURCE}${message.payload.userId}${PHOTO_RESOURCE}`, message)
+  yield update(message.payload.userId, {photoURL: message.payload.photoURL, updatedAt: message.payload.updatedAt, updatedBy: message.payload.updatedBy})
 }
 
 createPhoto.schema = {
@@ -199,8 +275,9 @@ createPhoto.schema = {
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required(),
-      photoURL: Joi.string().uri().required()
+      photoURL: Joi.string().uri().required(),
+      updatedAt: Joi.string().required(),
+      updatedBy: Joi.string().required()
     }).unknown(true).required()
   }).required()
 }
@@ -210,8 +287,7 @@ createPhoto.schema = {
  * @param {Object} message the message
  */
 function * updatePhoto (message) {
-  message.payload.resource = PHOTO_RESOURCE
-  yield update(`${PROFILE_RESOURCE}${message.payload.userId}${PHOTO_RESOURCE}`, message)
+  yield update(message.payload.userId, {photoURL: message.payload.photoURL, updatedAt: message.payload.updatedAt, updatedBy: message.payload.updatedBy})
 }
 
 updatePhoto.schema = createPhoto.schema
