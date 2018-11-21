@@ -198,8 +198,8 @@ removeTrait.schema = {
  * @param {Object} message the message
  */
 function * createPhoto (message) {
-  message.payload.resource = PHOTO_RESOURCE
-  yield create(`${PROFILE_RESOURCE}${message.payload.userId}${PHOTO_RESOURCE}`, message)
+  //yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
+  //yield create(`${PROFILE_RESOURCE}${message.payload.userId}${PHOTO_RESOURCE}`, message)
 }
 
 createPhoto.schema = {
@@ -220,8 +220,8 @@ createPhoto.schema = {
  * @param {Object} message the message
  */
 function * updatePhoto (message) {
-  message.payload.resource = PHOTO_RESOURCE
-  yield update(`${PROFILE_RESOURCE}${message.payload.userId}${PHOTO_RESOURCE}`, message)
+  //message.payload.resource = PHOTO_RESOURCE
+  //yield update(`${PROFILE_RESOURCE}${message.payload.userId}${PHOTO_RESOURCE}`, message)
 }
 
 updatePhoto.schema = createPhoto.schema
