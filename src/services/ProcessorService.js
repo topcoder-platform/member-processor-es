@@ -2,6 +2,7 @@
  * Service for member processor.
  */
 const _ = require('lodash')
+var moment = require('moment')
 const Joi = require('joi')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
@@ -16,15 +17,28 @@ const client = helper.getESClient()
  * @return {Object} the converted payload
  */
 function convertPayload (payload) {
-  if (payload.createdAt) {
-    payload.createdAt = new Date(payload.createdAt).toISOString()
-  } else {
-    payload.createdAt = new Date()
+  if (payload.hasOwnProperty('createdAt')) {
+    if (payload.createdAt) {
+      payload.createdAt = moment(payload.createdAt).valueOf()
+    } else {
+      payload.createdAt = moment().valueOf()
+    }
   }
-  if (payload.updatedAt) {
-    payload.updatedAt = new Date(payload.updatedAt).toISOString()
-  } else {
-    payload.updatedAt = new Date()
+
+  if (payload.hasOwnProperty('updatedAt')) {
+    if (payload.updatedAt) {
+      payload.updatedAt = moment(payload.updatedAt).valueOf()
+    } else {
+      payload.updatedAt = moment().valueOf()
+    }
+  }
+
+  if (payload.hasOwnProperty('traits')) {
+    if (payload.traits.hasOwnProperty('data')) {
+      if (payload.traits.data[0].hasOwnProperty('birthDate')) {
+        payload.traits.data[0].birthDate = moment(payload.traits.data[0].birthDate).valueOf()
+      }
+    }
   }
   return payload
 }
@@ -34,10 +48,10 @@ function convertPayload (payload) {
  * @param {String} id the Elasticsearch record id
  * @param {Object} message the message
  */
-function * create (id, message) {
+function * create (id, type, message) {
   yield client.create({
     index: config.get('esConfig.ES_INDEX'),
-    type: config.get('esConfig.ES_TYPE'),
+    type: type,
     id,
     body: convertPayload(message.payload)
   })
@@ -48,11 +62,11 @@ function * create (id, message) {
  * @param {String} id the Elasticsearch record id
  * @param {Object} message the message
  */
-function * update (id, message) {
+function * update (id, type, message) {
   convertPayload(message.payload)
   yield client.update({
     index: config.get('esConfig.ES_INDEX'),
-    type: config.get('esConfig.ES_TYPE'),
+    type: type,
     id,
     body: { upsert: message.payload, doc: message.payload }
   })
@@ -62,11 +76,11 @@ function * update (id, message) {
  * Remove messages in Elasticsearch.
  * @param {Array} ids the Elasticsearch record ids
  */
-function * remove (ids) {
+function * remove (ids, type) {
   // remove records in parallel
   yield _.map(ids, (id) => client.delete({
     index: config.get('esConfig.ES_INDEX'),
-    type: config.get('esConfig.ES_TYPE'),
+    type: type,
     id
   }))
 }
@@ -76,8 +90,7 @@ function * remove (ids) {
  * @param {Object} message the message
  */
 function * createProfile (message) {
-  message.payload.resource = PROFILE_RESOURCE
-  yield create(`${PROFILE_RESOURCE}${message.payload.userId}`, message)
+  yield create(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
 }
 
 createProfile.schema = {
@@ -87,8 +100,7 @@ createProfile.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required()
+      userId: Joi.number().integer().min(1).required()
     }).unknown(true).required()
   }).required()
 }
@@ -98,8 +110,7 @@ createProfile.schema = {
  * @param {Object} message the message
  */
 function * updateProfile (message) {
-  message.payload.resource = PROFILE_RESOURCE
-  yield update(`${PROFILE_RESOURCE}${message.payload.userId}`, message)
+  yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
 }
 
 updateProfile.schema = createProfile.schema
@@ -109,7 +120,7 @@ updateProfile.schema = createProfile.schema
  * @param {Object} message the message
  */
 function * removeProfile (message) {
-  yield remove([`${PROFILE_RESOURCE}${message.payload.userId}`])
+  yield remove([`${message.payload.userId}`])
 }
 
 removeProfile.schema = {
@@ -119,8 +130,7 @@ removeProfile.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required()
+      userId: Joi.number().integer().min(1).required()
     }).required()
   }).required()
 }
@@ -130,8 +140,7 @@ removeProfile.schema = {
  * @param {Object} message the message
  */
 function * createTrait (message) {
-  message.payload.resource = TRAIT_RESOURCE
-  yield create(`${PROFILE_RESOURCE}${message.payload.userId}${TRAIT_RESOURCE}${message.payload.traitId}`, message)
+  yield create(`${message.payload.userId}${message.payload.traits.traitId}`, `${config.get('esConfig.ES_PROFILE_TRAIT_TYPE')}`, message)
 }
 
 createTrait.schema = {
@@ -142,8 +151,10 @@ createTrait.schema = {
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required(),
-      traitId: Joi.string().required()
+      traits: Joi.object().keys({
+        traitId: Joi.string().required(),
+        data: Joi.array().required()
+      })
     }).unknown(true).required()
   }).required()
 }
@@ -153,8 +164,7 @@ createTrait.schema = {
  * @param {Object} message the message
  */
 function * updateTrait (message) {
-  message.payload.resource = TRAIT_RESOURCE
-  yield update(`${PROFILE_RESOURCE}${message.payload.userId}${TRAIT_RESOURCE}${message.payload.traitId}`, message)
+  yield update(`${message.payload.userId}${message.payload.traits.traitId}`, `${config.get('esConfig.ES_PROFILE_TRAIT_TYPE')}`, message)
 }
 
 updateTrait.schema = createTrait.schema
@@ -165,7 +175,7 @@ updateTrait.schema = createTrait.schema
  */
 function * removeTrait (message) {
   yield remove(_.map(message.payload.memberProfileTraitIds, (traitId) =>
-    `${PROFILE_RESOURCE}${message.payload.userId}${TRAIT_RESOURCE}${traitId}`))
+    `${message.payload.userId}${traitId}`), `${config.get('esConfig.ES_PROFILE_TRAIT_TYPE')}`)
 }
 
 removeTrait.schema = {
@@ -176,8 +186,9 @@ removeTrait.schema = {
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required(),
-      memberProfileTraitIds: Joi.array().items(Joi.number().integer().min(1).required()).min(1).required()
+      memberProfileTraitIds: Joi.array().items().min(1).required(),
+      updatedBy: Joi.string(),
+      updatedAt: Joi.string()
     }).required()
   }).required()
 }
@@ -199,7 +210,6 @@ createPhoto.schema = {
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
       userId: Joi.number().integer().min(1).required(),
-      userHandle: Joi.string().required(),
       photoURL: Joi.string().uri().required()
     }).unknown(true).required()
   }).required()
