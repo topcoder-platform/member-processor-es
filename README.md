@@ -42,7 +42,7 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 - `http://kafka.apache.org/quickstart` contains details to setup and manage Kafka server,
   below provides details to setup Kafka server in Mac, Windows will use bat commands in bin/windows instead
 - download kafka at `https://www.apache.org/dyn/closer.cgi?path=/kafka/1.1.0/kafka_2.11-1.1.0.tgz`
-- extract out the doanlowded tgz file
+- extract out the downloaded tgz file
 - go to extracted directory kafka_2.11-0.11.0.1
 - start ZooKeeper server:
   `bin/zookeeper-server-start.sh config/zookeeper.properties`
@@ -150,19 +150,18 @@ npm run cov-e2e
 - start kafka-console-producer to write messages to `member.action.profile.create` topic:
   `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic member.action.profile.create`
 - write message:
-  `{ "topic": "member.action.profile.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "email": "email@test.com", "sex": "male", "created": "2018-02-16T00:00:00", "createdBy": "admin" } }`
+  `{ "topic": "member.action.profile.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "email": "email@test.com", "sex": "male", "createdAt": "2018-02-16T00:00:00", "createdBy": "admin" } }`
 - run command `npm run view-data profile1111` to view the created data, you will see the data are properly created:
 
 ```bash
 info: Elasticsearch data:
+info: Elasticsearch data:
 info: {
     "userId": 1111,
-    "userHandle": "handle",
     "email": "email@test.com",
     "sex": "male",
-    "created": "2018-02-16T00:00:00",
-    "createdBy": "admin",
-    "resource": "profile"
+    "createdAt": "2018-02-16T00:00:00",
+    "createdBy": "admin"
 }
 ```
 
@@ -173,29 +172,25 @@ info: {
 - start kafka-console-producer to write messages to `member.action.profile.update` topic:
   `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic member.action.profile.update`
 - write message:
-  `{ "topic": "member.action.profile.update", "originator": "member-api", "timestamp": "2018-03-02T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "email": "updated@test.com", "sex": "male", "created": "2018-01-02T00:00:00", "createdBy": "admin", "updated": "2018-03-02T00:00:00", "updatedBy": "admin" } }`
-- run command `npm run view-data profile1111` to view the updated data, you will see the data are properly updated:
+  `{ "topic": "member.action.profile.update", "originator": "member-api", "timestamp": "2018-03-02T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "email": "updated@test.com", "sex": "male", "createdAt": "2018-01-02T00:00:00", "createdBy": "admin", "updatedAt": "2018-03-02T00:00:00", "updatedBy": "admin" } }`
+- run command `npm run view-data 1111` to view the updated data, you will see the data are properly updated:
 
 ```bash
 info: Elasticsearch data:
 info: {
     "userId": 1111,
-    "userHandle": "handle",
     "email": "updated@test.com",
     "sex": "male",
-    "created": "2018-01-02T00:00:00",
-    "createdBy": "admin",
-    "resource": "profile",
-    "updatedBy": "admin",
-    "updated": "2018-03-02T00:00:00"
+    "createdAt": "2018-01-02T00:00:00",
+    "createdBy": "admin"
 }
 ```
 
 - start kafka-console-producer to write messages to `member.action.profile.delete` topic:
   `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic member.action.profile.delete`
 - write message:
-  `{ "topic": "member.action.profile.delete", "originator": "member-api", "timestamp": "2018-04-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle" } }`
-- run command `npm run view-data profile1111` to view the deleted data, you will see the data are properly deleted:
+  `{ "topic": "member.action.profile.delete", "originator": "member-api", "timestamp": "2018-04-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111} }`
+- run command `npm run view-data 1111` to view the deleted data, you will see the data are properly deleted:
 
 ```bash
 info: The data is not found.
@@ -203,20 +198,18 @@ info: The data is not found.
 
 - management of other data are similar, below gives valid Kafka messages for other resource types, so that you may test them easily
 - create trait:
-  `{ "topic": "member.action.profile.trait.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "traitId": 123, "created": "2018-02-16T00:00:00", "createdBy": "admin" } }`
-  `{ "topic": "member.action.profile.trait.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "traitId": 456, "created": "2018-02-16T00:00:00", "createdBy": "admin" } }`
+  ` {"topic":"member.action.profile.trait.create","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:39:37.360Z","payload":{"userId":132456,"lastName":"Kranitsas","addresses":[{"streetAddr1":"address 1","streetAddr2":"address 2","city":"city","zip":"121212","stateCode":"code","type":"HOME","updatedAt":null,"createdAt":null,"createdBy":null,"updatedBy":null}],"updatedBy":"132456","description":"des","homeCountryCode":null,"handle":"heffan","otherLangName":"NIAL","handleLower":"heffan","emailVerifyTokenDate":null,"tracks":["DATA_SCIENCE","DEVELOP"],"firstName":"Thomas","photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","createdAt":"2018-10-12T11:07:02.231Z","createdBy":"132456","emailVerifyToken":null,"maxRating":null,"newEmail":null,"competitionCountryCode":"USA","email":"heffanNew@email.com","status":"ACTIVE","updatedAt":"2018-10-12T11:39:37.323Z","traits":[{"traitId":"basic_info","data":[{"shortBio":"There is no great genius without some touch of madness.","gender":"Male","tshirtSize":"L","country":"Greece","primaryInterestInTopcoder":"Copiloting!","birthDate":"1994-04-10T10:10:11.000Z","currentLocation":"test place"}]}]}}`
 - update trait:
-  `{ "topic": "member.action.profile.trait.update", "originator": "member-api", "timestamp": "2018-02-17T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "traitId": 123, "created": "2018-02-16T00:00:00", "createdBy": "admin", "updated": "2018-02-17T00:00:00", "updatedBy": "admin" } }`
+  `{"topic":"member.action.profile.trait.update","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:40:24.002Z","payload":{"userId":132456,"lastName":"Kranitsas","addresses":[{"streetAddr1":"address 1","streetAddr2":"address 2","city":"city","zip":"121212","stateCode":"code","type":"HOME","updatedAt":null,"createdAt":null,"createdBy":null,"updatedBy":null}],"updatedBy":"132456","description":"des","homeCountryCode":null,"handle":"heffan","otherLangName":"NIAL update","handleLower":"heffan","emailVerifyTokenDate":null,"tracks":["DATA_SCIENCE","DEVELOP"],"firstName":"Thomas","photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","createdAt":"2018-10-12T11:07:02.231Z","createdBy":"132456","emailVerifyToken":null,"maxRating":null,"newEmail":null,"competitionCountryCode":"USA","email":"heffanNew@email.com","status":"ACTIVE","updatedAt":"2018-10-12T11:40:23.966Z","traits":[{"traitId":"basic_info","data":[{"shortBio":"There is no great genius without some touch of madness. update............","gender":"Male","tshirtSize":"L","country":"Greece","primaryInterestInTopcoder":"Copiloting!","birthDate":"1994-04-10T10:10:11.000Z","currentLocation":"test place","email":"heffanNew@email.com"}]}]}}`
 - delete trait:
-  `{ "topic": "member.action.profile.trait.delete", "originator": "member-api", "timestamp": "2018-02-18T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "memberProfileTraitIds": [123, 456] } }`
-
+  `{ "topic": "{"topic":"member.action.profile.trait.delete","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:41:02.341Z","payload":{"userId":132456,"memberProfileTraitIds":["basic_info"],"updatedAt":"2018-10-12T11:41:02.341Z","updatedBy":"132456"}}`
 - create photo:
-  `{ "topic": "member.action.profile.photo.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "photoURL": "http://test.com/123.png", "created": "2018-02-16T00:00:00", "createdBy": "admin" } }`
+  ` {"topic":"member.action.profile.photo.create","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:42:10.186Z","payload":{"userId":132456,"photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","updatedAt":"2018-10-12T11:42:10.173Z","updatedBy":"132456"}}`
 - update photo:
-  `{ "topic": "member.action.profile.photo.update", "originator": "member-api", "timestamp": "2018-02-17T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "userHandle": "handle", "photoURL": "http://test.com/456.png", "created": "2018-02-16T00:00:00", "createdBy": "admin", "updated": "2018-02-16T00:00:00", "updatedBy": "admin" } }`
+  ` {"topic":"member.action.profile.photo.update","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:42:10.186Z","payload":{"userId":132456,"photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","updatedAt":"2018-10-12T11:42:10.173Z","updatedBy":"132456"}}`
 
-- to view photo data, run command `npm run view-data profile<userId>photo`, e.g. `npm run view-data profile1111photo`
-- to view trait data, run command `npm run view-data profile<userId>trait<traitId>`, e.g. `npm run view-data profile1111trait123`
+- to view photo data, run command `npm run view-data 1111`
+- to view trait data, run command `npm run view-data 1111`
 
 
 ## Notes
@@ -224,4 +217,3 @@ info: The data is not found.
   ('profile' + userId) is used to identify profile,
   ('profile' + userId + 'photo') is used to identify photo,
   ('profile' + userId + 'trait' + traitId) is used to identify trait
-

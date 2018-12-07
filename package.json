@@ -1,7 +1,7 @@
 {
-  "name": "tc-submission-processor",
+  "name": "tc-member-processor-es",
   "version": "1.0.0",
-  "description": "Topcoder - Submission Processor",
+  "description": "Topcoder - Member Processor ES",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
@@ -36,7 +36,8 @@
     "lodash": "^4.17.10",
     "no-kafka": "^3.2.4",
     "topcoder-healthcheck-dropin": "^1.0.2",
-    "winston": "^2.2.0"
+    "winston": "^2.2.0",
+    "moment": "^2.22.2"
   },
   "engines": {
     "node": "8.x"

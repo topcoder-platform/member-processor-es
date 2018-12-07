@@ -2,7 +2,7 @@
  * Test data to be used in tests
  */
 
-const profileId = 'profile11'
+const profileId = '11'
 
 const createProfileMessage = {
   topic: 'member.action.profile.create',
@@ -11,11 +11,12 @@ const createProfileMessage = {
   'mime-type': 'application/json',
   payload: {
     userId: 11,
-    userHandle: 'handle',
     sex: 'male',
     email: 'email@test.com',
-    created: '2018-02-03T00:00:00',
-    createdBy: 'admin'
+    createdAt: '2018-02-03T00:00:00',
+    createdBy: 'admin',
+    updatedAt: '2018-03-04T00:00:00',
+    updatedBy: 'admin2'
   }
 }
 
@@ -26,12 +27,11 @@ const updateProfileMessage = {
   'mime-type': 'application/json',
   payload: {
     userId: 11,
-    userHandle: 'handle',
     sex: 'female',
     email: 'updated@test.com',
-    created: '2018-02-03T00:00:00',
+    createdAt: '2018-02-03T00:00:00',
     createdBy: 'admin',
-    updated: '2018-03-04T00:00:00',
+    updatedAt: '2018-03-04T00:00:00',
     updatedBy: 'admin2'
   }
 }
@@ -42,12 +42,11 @@ const deleteProfileMessage = {
   timestamp: '2018-03-05T00:00:00',
   'mime-type': 'application/json',
   payload: {
-    userId: 11,
-    userHandle: 'handle'
+    userId: 11
   }
 }
 
-const traitId = 'profile11trait123'
+const traitId = '123'
 
 const createTraitMessage = {
   topic: 'member.action.profile.trait.create',
@@ -55,12 +54,22 @@ const createTraitMessage = {
   timestamp: '2018-02-03T00:00:00',
   'mime-type': 'application/json',
   payload: {
-    userId: 11,
-    userHandle: 'handle',
-    traitId: 123,
-    traitAttribute: 'value',
-    created: '2018-02-03T00:00:00',
-    createdBy: 'admin'
+    userId: traitId,
+	createdAt: '2018-02-03T00:00:00',
+    createdBy: 'admin',
+    updatedAt: '2018-03-04T00:00:00',
+    updatedBy: 'admin2',
+    "traits": [{
+	  "traitId": "device",
+	  "data": [{
+        "deviceType": "Desktop",
+		"manufacturer": "Apple",
+	    "model": "MacBook Pro xx",
+        "operatingSystem": "MacOS",
+        "osVersion": "High Sierra 10.13.4",
+        "osLanguage": "English"
+       }]
+    }]
   }
 }
 
@@ -70,14 +79,20 @@ const updateTraitMessage = {
   timestamp: '2018-02-04T00:00:00',
   'mime-type': 'application/json',
   payload: {
-    userId: 11,
-    userHandle: 'handle',
-    traitId: 123,
-    traitAttribute: 'updated',
-    created: '2018-02-03T00:00:00',
-    createdBy: 'admin',
-    updated: '2018-02-04T00:00:00',
-    updatedBy: 'admin2'
+    userId: traitId,
+    updatedAt: '2018-03-04T00:00:00',
+    updatedBy: 'admin2',
+    "traits": [{
+	  "traitId": "device",
+	  "data": [{
+        "deviceType": "Desktop",
+		"manufacturer": "Apple",
+	    "model": "MacBook Pro xx",
+        "operatingSystem": "MacOS",
+        "osVersion": "High Sierra 10.13.4",
+        "osLanguage": "English"
+       }]
+    }]
   }
 }
 
@@ -87,13 +102,14 @@ const deleteTraitMessage = {
   timestamp: '2018-02-05T00:00:00',
   'mime-type': 'application/json',
   payload: {
-    userId: 11,
-    userHandle: 'handle',
-    memberProfileTraitIds: [123]
+    userId: traitId,
+    memberProfileTraitIds: [123],
+    updatedAt: '2018-03-04T00:00:00',
+    updatedBy: 'admin2'
   }
 }
 
-const photoId = 'profile11photo'
+const photoId = 1234
 
 const createPhotoMessage = {
   topic: 'member.action.profile.photo.create',
@@ -101,11 +117,12 @@ const createPhotoMessage = {
   timestamp: '2018-02-03T00:00:00',
   'mime-type': 'application/json',
   payload: {
-    userId: 11,
-    userHandle: 'handle',
+    userId: photoId,
     photoURL: 'http://test.com/abc.png',
-    created: '2018-02-03T00:00:00',
-    createdBy: 'admin'
+    createdAt: '2018-02-03T00:00:00',
+    createdBy: 'admin',
+    updatedAt: '2018-02-04T00:00:00',
+    updatedBy: 'admin2'
   }
 }
 
@@ -115,12 +132,11 @@ const updatePhotoMessage = {
   timestamp: '2018-02-04T00:00:00',
   'mime-type': 'application/json',
   payload: {
-    userId: 11,
-    userHandle: 'handle',
+    userId: photoId,
     photoURL: 'http://test.com/def.png',
-    created: '2018-02-03T00:00:00',
+    createdAt: '2018-02-03T00:00:00',
     createdBy: 'admin',
-    updated: '2018-02-04T00:00:00',
+    updatedAt: '2018-02-04T00:00:00',
     updatedBy: 'admin2'
   }
 }
