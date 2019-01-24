@@ -3,23 +3,21 @@
  */
 
 global.Promise = require('bluebird')
-const _ = require('lodash')
 const config = require('config')
 const logger = require('./common/logger')
 const Kafka = require('no-kafka')
-const co = require('co')
 const ProcessorService = require('./services/ProcessorService')
 const healthcheck = require('topcoder-healthcheck-dropin')
 
 // create consumer
-const options = { connectionString: config.KAFKA_URL }
+const options = { connectionString: config.KAFKA_URL, groupId: config.KAFKA_GROUP_ID }
 if (config.KAFKA_CLIENT_CERT && config.KAFKA_CLIENT_CERT_KEY) {
   options.ssl = { cert: config.KAFKA_CLIENT_CERT, key: config.KAFKA_CLIENT_CERT_KEY }
 }
-const consumer = new Kafka.SimpleConsumer(options)
+const consumer = new Kafka.GroupConsumer(options)
 
 // data handler
-const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (m) => {
+const dataHandler = async (messageSet, topic, partition) => Promise.each(messageSet, async (m) => {
   const message = m.message.value.toString('utf8')
   logger.info(`Handle Kafka event message; Topic: ${topic}; Partition: ${partition}; Offset: ${
     m.offset}; Message: ${message}.`)
@@ -37,39 +35,41 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (
     // ignore the message
     return
   }
-  return co(function * () {
+  try {
     switch (topic) {
       case config.CREATE_PROFILE_TOPIC:
-        yield ProcessorService.createProfile(messageJSON)
+        await ProcessorService.createProfile(messageJSON)
         break
       case config.UPDATE_PROFILE_TOPIC:
-        yield ProcessorService.updateProfile(messageJSON)
+        await ProcessorService.updateProfile(messageJSON)
         break
       case config.DELETE_PROFILE_TOPIC:
-        yield ProcessorService.removeProfile(messageJSON)
+        await ProcessorService.removeProfile(messageJSON)
         break
       case config.CREATE_TRAIT_TOPIC:
-        yield ProcessorService.createTrait(messageJSON)
+        await ProcessorService.createTrait(messageJSON)
         break
       case config.UPDATE_TRAIT_TOPIC:
-        yield ProcessorService.updateTrait(messageJSON)
+        await ProcessorService.updateTrait(messageJSON)
         break
       case config.DELETE_TRAIT_TOPIC:
-        yield ProcessorService.removeTrait(messageJSON)
+        await ProcessorService.removeTrait(messageJSON)
         break
       case config.CREATE_PHOTO_TOPIC:
-        yield ProcessorService.createPhoto(messageJSON)
+        await ProcessorService.createPhoto(messageJSON)
         break
       case config.UPDATE_PHOTO_TOPIC:
-        yield ProcessorService.updatePhoto(messageJSON)
+        await ProcessorService.updatePhoto(messageJSON)
         break
       default:
         throw new Error(`Invalid topic: ${topic}`)
     }
-  })
+
     // commit offset
-    .then(() => consumer.commitOffset({ topic, partition, offset: m.offset }))
-    .catch((err) => logger.error(err))
+    await consumer.commitOffset({ topic, partition, offset: m.offset })
+  } catch (err) {
+    logger.error(err)
+  }
 })
 
 // check if there is kafka connection alive
@@ -85,15 +85,17 @@ function check () {
   return connected
 }
 
+const topics = [config.CREATE_PROFILE_TOPIC, config.UPDATE_PROFILE_TOPIC, config.DELETE_PROFILE_TOPIC,
+  config.CREATE_TRAIT_TOPIC, config.UPDATE_TRAIT_TOPIC, config.DELETE_TRAIT_TOPIC,
+  config.CREATE_PHOTO_TOPIC, config.UPDATE_PHOTO_TOPIC]
+
+// consume configured topics
 consumer
-  .init()
-  // consume configured topics
+  .init([{
+    subscriptions: topics,
+    handler: dataHandler
+  }])
   .then(() => {
     healthcheck.init([check])
-
-    const topics = [config.CREATE_PROFILE_TOPIC, config.UPDATE_PROFILE_TOPIC, config.DELETE_PROFILE_TOPIC,
-      config.CREATE_TRAIT_TOPIC, config.UPDATE_TRAIT_TOPIC, config.DELETE_TRAIT_TOPIC,
-      config.CREATE_PHOTO_TOPIC, config.UPDATE_PHOTO_TOPIC]
-    _.each(topics, (tp) => consumer.subscribe(tp, { time: Kafka.LATEST_OFFSET }, dataHandler))
   })
   .catch((err) => logger.error(err))
