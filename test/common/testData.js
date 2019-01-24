@@ -55,20 +55,20 @@ const createTraitMessage = {
   'mime-type': 'application/json',
   payload: {
     userId: traitId,
-	createdAt: '2018-02-03T00:00:00',
+    createdAt: '2018-02-03T00:00:00',
     createdBy: 'admin',
     updatedAt: '2018-03-04T00:00:00',
     updatedBy: 'admin2',
-    "traits": [{
-	  "traitId": "device",
-	  "data": [{
-        "deviceType": "Desktop",
-		"manufacturer": "Apple",
-	    "model": "MacBook Pro xx",
-        "operatingSystem": "MacOS",
-        "osVersion": "High Sierra 10.13.4",
-        "osLanguage": "English"
-       }]
+    'traits': [{
+      'traitId': 'device',
+      'data': [{
+        'deviceType': 'Desktop',
+        'manufacturer': 'Apple',
+        'model': 'MacBook Pro xx',
+        'operatingSystem': 'MacOS',
+        'osVersion': 'High Sierra 10.13.4',
+        'osLanguage': 'English'
+      }]
     }]
   }
 }
@@ -82,16 +82,16 @@ const updateTraitMessage = {
     userId: traitId,
     updatedAt: '2018-03-04T00:00:00',
     updatedBy: 'admin2',
-    "traits": [{
-	  "traitId": "device",
-	  "data": [{
-        "deviceType": "Desktop",
-		"manufacturer": "Apple",
-	    "model": "MacBook Pro xx",
-        "operatingSystem": "MacOS",
-        "osVersion": "High Sierra 10.13.4",
-        "osLanguage": "English"
-       }]
+    'traits': [{
+      'traitId': 'device',
+      'data': [{
+        'deviceType': 'Desktop',
+        'manufacturer': 'Apple',
+        'model': 'MacBook Pro xx',
+        'operatingSystem': 'MacOS',
+        'osVersion': 'High Sierra 10.13.4',
+        'osLanguage': 'English'
+      }]
     }]
   }
 }
