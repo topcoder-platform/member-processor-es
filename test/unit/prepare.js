@@ -18,7 +18,7 @@ const {
   createPhotoMessage,
   updatePhotoMessage
 } = require('../common/testData')
-const { PROFILE_RESOURCE } = require('../../src/constants')
+const { PROFILE_RESOURCE, TRAIT_RESOURCE, PHOTO_RESOURCE } = require('../../src/constants')
 const testHelper = require('../common/testHelper')
 
 const ops = ['_create', '_update'] // ES operations

@@ -7,6 +7,8 @@ const Joi = require('joi')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
 const config = require('config')
+const { PROFILE_RESOURCE, TRAIT_RESOURCE, PHOTO_RESOURCE } = require('../constants')
+
 const client = helper.getESClient()
 
 /**
