@@ -8,16 +8,20 @@ const ProcessorService = require('../../src/services/ProcessorService')
 const co = require('co')
 const testHelper = require('../common/testHelper')
 const {
+  profileId,
   createProfileMessage,
   updateProfileMessage,
   deleteProfileMessage,
+  traitId,
   createTraitMessage,
   updateTraitMessage,
   deleteTraitMessage,
+  photoId,
   createPhotoMessage,
   updatePhotoMessage,
   TEST_TIMEOUT_MS
 } = require('../common/testData')
+const { PROFILE_RESOURCE, TRAIT_RESOURCE, PHOTO_RESOURCE } = require('../../src/constants')
 
 describe('TC Member Processor Tests', () => {
   it('create profile message', (done) => {
@@ -77,7 +81,7 @@ describe('TC Member Processor Tests', () => {
         yield ProcessorService.removeProfile(deleteProfileMessage.payload.userId)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
-        // expect(err.statusCode).to.equal(404)
+        //expect(err.statusCode).to.equal(404)
         return
       }
       throw new Error('There should be not found error.')
