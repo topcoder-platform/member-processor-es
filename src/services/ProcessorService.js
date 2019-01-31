@@ -49,12 +49,11 @@ function convertPayload (payload) {
  * @param {Object} message the message
  */
 function * create (id, type, message) {
-  convertPayload(message.payload)
   yield client.create({
     index: config.get('esConfig.ES_INDEX'),
     type: type,
     id,
-    body: { upsert: message.payload, doc: message.payload }
+    body: convertPayload(message.payload)
   })
 }
 
@@ -199,6 +198,9 @@ removeTrait.schema = {
  * @param {Object} message the message
  */
 function * createPhoto (message) {
+  console.log('createPhoto : Start -----------------------------')
+  console.log(message)
+  console.log('createPhoto : End   -----------------------------')
   yield create(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
 }
 
@@ -220,6 +222,9 @@ createPhoto.schema = {
  * @param {Object} message the message
  */
 function * updatePhoto (message) {
+  console.log('updatePhoto : Start -----------------------------')
+  console.log(message)
+  console.log('updatePhoto : End   -----------------------------')
   yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
 }
 
