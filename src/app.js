@@ -40,7 +40,13 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (
   return co(function * () {
     switch (topic) {
       case config.CREATE_PROFILE_TOPIC:
-        yield ProcessorService.createProfile(messageJSON)
+        try {
+          yield ProcessorService.createProfile(messageJSON)
+        } catch (e) {
+          logger.error('Failed to create profile. Will try to update.')
+          logger.error(e)
+          yield ProcessorService.updateProfile(messageJSON)
+        }
         break
       case config.UPDATE_PROFILE_TOPIC:
         yield ProcessorService.updateProfile(messageJSON)
