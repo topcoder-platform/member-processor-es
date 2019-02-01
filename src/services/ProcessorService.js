@@ -49,11 +49,12 @@ function convertPayload (payload) {
  * @param {Object} message the message
  */
 function * create (id, type, message) {
+  convertPayload(message.payload)
   yield client.create({
     index: config.get('esConfig.ES_INDEX'),
     type: type,
     id,
-    body: convertPayload(message.payload)
+    body: { upsert: message.payload, doc: message.payload }
   })
 }
 
@@ -90,7 +91,19 @@ function * remove (ids, type) {
  * @param {Object} message the message
  */
 function * createProfile (message) {
-  yield create(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
+  const exists = yield client.exists({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_PROFILE_TYPE'),
+    id: message.payload.userId
+  });
+  
+  if(exists) {
+    console.log("ES Updated for " + message.payload.userId);
+    yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
+  } else {
+    console.log("ES Created for " + message.payload.userId);
+    yield create(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
+  }
 }
 
 createProfile.schema = {
@@ -198,9 +211,6 @@ removeTrait.schema = {
  * @param {Object} message the message
  */
 function * createPhoto (message) {
-  console.log('createPhoto : Start -----------------------------')
-  console.log(message)
-  console.log('createPhoto : End   -----------------------------')
   yield create(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
 }
 
@@ -222,9 +232,6 @@ createPhoto.schema = {
  * @param {Object} message the message
  */
 function * updatePhoto (message) {
-  console.log('updatePhoto : Start -----------------------------')
-  console.log(message)
-  console.log('updatePhoto : End   -----------------------------')
   yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
 }
 
