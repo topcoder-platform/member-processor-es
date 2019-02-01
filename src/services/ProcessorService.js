@@ -49,12 +49,11 @@ function convertPayload (payload) {
  * @param {Object} message the message
  */
 function * create (id, type, message) {
-  convertPayload(message.payload)
   yield client.create({
     index: config.get('esConfig.ES_INDEX'),
     type: type,
     id,
-    body: { upsert: message.payload, doc: message.payload }
+    body: convertPayload(message.payload)
   })
 }
 
