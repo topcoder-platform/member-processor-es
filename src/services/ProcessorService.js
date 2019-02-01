@@ -39,7 +39,21 @@ function convertPayload (payload) {
         payload.traits.data[0].birthDate = moment(payload.traits.data[0].birthDate).valueOf()
       }
     }
+  } else {
+    payload.handleSuggest = {
+      input: payload.handle,
+      output: payload.handle,
+      payload: {
+          handle: payload.handle,
+          userId: payload.userId.toString(),
+          id: payload.userId.toString(),
+          photoURL: payload.photoURL,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+      }
+    }
   }
+
   return payload
 }
 
