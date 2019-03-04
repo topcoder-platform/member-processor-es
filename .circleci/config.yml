@@ -37,6 +37,7 @@ jobs:
             source buildenvvar
             ./master_deploy.sh -d ECS -e DEV -t latest -s member-processor-es_appvar -i member-processor-es
             
+            
   "build-prod":
     docker:
       - image: docker:18.06.0-ce-git
