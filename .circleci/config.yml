@@ -27,10 +27,17 @@ jobs:
       - deploy:
           name: Running Masterscript.
           command: |
-            git clone --branch v1.1 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
+            git clone --branch v1.3 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deploy.sh .
-            ./master_deploy.sh -d ECS -e DEV -t $CIRCLE_BUILD_NUM -s member-processor-es
-
+            cp ./../buildscript/buildenv.sh .
+            cp ./../buildscript/awsconfiguration.sh .
+            ./awsconfiguration.sh DEV
+            source awsenvconf 
+            ./buildenv.sh -e DEV -b member-processor-es_deployvar
+            source buildenvvar
+            ./master_deploy.sh -d ECS -e DEV -t latest -s member-processor-es_appvar -i member-processor-es
+            
+            
   "build-prod":
     docker:
       - image: docker:18.06.0-ce-git
@@ -56,19 +63,27 @@ jobs:
       - deploy:
           name: Running Masterscript.
           command: |
-            git clone --branch v1.1 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
+            git clone --branch v1.3 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deploy.sh .
-            ./master_deploy.sh -d ECS -e PROD -t $CIRCLE_BUILD_NUM -s member-processor-es-prod
-workflows:
+            cp ./../buildscript/buildenv.sh .
+            cp ./../buildscript/awsconfiguration.sh .
+            ./awsconfiguration.sh PROD
+            source awsenvconf 
+            ./buildenv.sh -e PROD -b member-processor-es-prod_deployvar
+            source buildenvvar
+            ./master_deploy.sh -d ECS -e PROD -t latest -s member-processor-es-prod_appvar -i member-processor-es
+       
   version: 2
   build:
     jobs:
       # Development builds are executed on "develop" branch only.
       - "build-dev":
+          context : org-global
           filters:
             branches:
               only: [ "develop", "dev-circleci" ]
       - "build-prod":
+          context : org-global
           filters:
             branches:
               only: master
