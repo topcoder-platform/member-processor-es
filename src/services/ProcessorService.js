@@ -33,6 +33,14 @@ function convertPayload (payload) {
     }
   }
 
+  if (payload.hasOwnProperty('emailVerifyTokenDate')) {
+    if (payload.emailVerifyTokenDate) {
+      payload.emailVerifyTokenDate = moment(payload.emailVerifyTokenDate).valueOf()
+    } else {
+      payload.emailVerifyTokenDate = moment().valueOf()
+    }
+  }
+
   if (payload.hasOwnProperty('traits')) {
     if (payload.traits.hasOwnProperty('data')) {
       if (payload.traits.data[0].hasOwnProperty('birthDate')) {
