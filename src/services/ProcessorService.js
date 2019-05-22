@@ -43,15 +43,17 @@ function convertPayload (payload) {
 
   if (payload.hasOwnProperty('traits')) {
     if (payload.traits.hasOwnProperty('data')) {
-      if (payload.traits.data[0].hasOwnProperty('birthDate')) {
-        payload.traits.data[0].birthDate = moment(payload.traits.data[0].birthDate).valueOf()
-      }
-      if (payload.traits.data[0].hasOwnProperty('timePeriodFrom')) {
-        payload.traits.data[0].timePeriodFrom = moment(payload.traits.data[0].timePeriodFrom).valueOf()
-      }
-      if (payload.traits.data[0].hasOwnProperty('timePeriodTo')) {
-        payload.traits.data[0].timePeriodTo = moment(payload.traits.data[0].timePeriodTo).valueOf()
-      }
+      payload.traits.data.forEach(function(element) {
+        if (element.hasOwnProperty('birthDate')) {
+          element.birthDate = moment(element.birthDate).valueOf()
+        }
+        if (element.hasOwnProperty('timePeriodFrom')) {
+          element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
+        }
+        if (element.hasOwnProperty('timePeriodTo')) {
+          element.timePeriodTo = moment(element.timePeriodTo).valueOf()
+        }
+      });
     }
   } else {
     payload.handleSuggest = {
