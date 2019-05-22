@@ -46,6 +46,12 @@ function convertPayload (payload) {
       if (payload.traits.data[0].hasOwnProperty('birthDate')) {
         payload.traits.data[0].birthDate = moment(payload.traits.data[0].birthDate).valueOf()
       }
+      if (payload.traits.data[0].hasOwnProperty('timePeriodFrom')) {
+        payload.traits.data[0].timePeriodFrom = moment(payload.traits.data[0].timePeriodFrom).valueOf()
+      }
+      if (payload.traits.data[0].hasOwnProperty('timePeriodTo')) {
+        payload.traits.data[0].timePeriodTo = moment(payload.traits.data[0].timePeriodTo).valueOf()
+      }
     }
   } else {
     payload.handleSuggest = {
