@@ -41,6 +41,14 @@ function convertPayload (payload) {
     }
   }
 
+  if (payload.hasOwnProperty('newEmailVerifyTokenDate')) {
+    if (payload.newEmailVerifyTokenDate) {
+      payload.newEmailVerifyTokenDate = moment(payload.newEmailVerifyTokenDate).valueOf()
+    } else {
+      payload.newEmailVerifyTokenDate = moment().valueOf()
+    }
+  }
+
   if (payload.hasOwnProperty('traits')) {
     if (payload.traits.hasOwnProperty('data')) {
       payload.traits.data.forEach(function(element) {
