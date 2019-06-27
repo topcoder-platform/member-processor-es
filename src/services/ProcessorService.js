@@ -56,10 +56,18 @@ function convertPayload (payload) {
           element.birthDate = moment(element.birthDate).valueOf()
         }
         if (element.hasOwnProperty('timePeriodFrom')) {
-          element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
+          if (element.timePeriodFrom) {
+            element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
+          } else {
+            element.timePeriodFrom = moment().valueOf()
+          }
         }
         if (element.hasOwnProperty('timePeriodTo')) {
-          element.timePeriodTo = moment(element.timePeriodTo).valueOf()
+          if (element.timePeriodTo) {
+            element.timePeriodTo = moment(element.timePeriodTo).valueOf()
+          } else {
+            element.timePeriodTo = moment().valueOf()
+          }
         }
       });
     }
