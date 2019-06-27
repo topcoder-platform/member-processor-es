@@ -59,14 +59,14 @@ function convertPayload (payload) {
           if (element.timePeriodFrom) {
             element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
           } else {
-            element.timePeriodFrom = moment("1970-01-01T00:00:00.000Z").valueOf()
+            element.timePeriodFrom = null
           }
         }
         if (element.hasOwnProperty('timePeriodTo')) {
           if (element.timePeriodTo) {
             element.timePeriodTo = moment(element.timePeriodTo).valueOf()
           } else {
-            element.timePeriodTo = moment("1970-01-01T00:00:00.000Z").valueOf()
+            element.timePeriodTo = null
           }
         }
       });
