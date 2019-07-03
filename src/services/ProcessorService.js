@@ -41,11 +41,38 @@ function convertPayload (payload) {
     }
   }
 
+  if (payload.hasOwnProperty('newEmailVerifyTokenDate')) {
+    if (payload.newEmailVerifyTokenDate) {
+      payload.newEmailVerifyTokenDate = moment(payload.newEmailVerifyTokenDate).valueOf()
+    } else {
+      payload.newEmailVerifyTokenDate = moment().valueOf()
+    }
+  }
+
   if (payload.hasOwnProperty('traits')) {
     if (payload.traits.hasOwnProperty('data')) {
-      if (payload.traits.data[0].hasOwnProperty('birthDate')) {
-        payload.traits.data[0].birthDate = moment(payload.traits.data[0].birthDate).valueOf()
-      }
+      payload.traits.data.forEach(function(element) {
+        if (element.hasOwnProperty('birthDate')) {
+          element.birthDate = moment(element.birthDate).valueOf()
+        }
+        if (element.hasOwnProperty('timePeriodFrom')) {
+          console.log("Time Period From - " + element.timePeriodFrom);
+          if (element.timePeriodFrom) {
+            console.log("Time Period Converted - " + moment(element.timePeriodFrom).valueOf());
+            element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
+          } else {
+            console.log("Null");
+            element.timePeriodFrom = null
+          }
+        }
+        if (element.hasOwnProperty('timePeriodTo')) {
+          if (element.timePeriodTo) {
+            element.timePeriodTo = moment(element.timePeriodTo).valueOf()
+          } else {
+            element.timePeriodTo = null
+          }
+        }
+      });
     }
   } else {
     payload.handleSuggest = {
