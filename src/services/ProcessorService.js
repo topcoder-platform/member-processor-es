@@ -56,9 +56,12 @@ function convertPayload (payload) {
           element.birthDate = moment(element.birthDate).valueOf()
         }
         if (element.hasOwnProperty('timePeriodFrom')) {
+          console.log("Time Period From - " + element.timePeriodFrom);
           if (element.timePeriodFrom) {
+            console.log("Time Period Converted - " + moment(element.timePeriodFrom).valueOf());
             element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
           } else {
+            console.log("Null");
             element.timePeriodFrom = null
           }
         }
