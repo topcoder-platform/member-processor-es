@@ -112,19 +112,12 @@ function * create (id, type, message) {
  * @param {Object} message the message
  */
 function * update (id, type, message) {
-  console.log('==============================================')
-  console.log('==============================================')
-  console.log('update - ')
-  console.log(id)
-  console.log(type)
-  console.log(convertPayload(message.payload))
-  console.log('==============================================')
-  console.log('==============================================')
+  convertPayload(message.payload)
   yield client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: type,
     id,
-    body: { upsert: convertPayload(message.payload), doc: message.payload }
+    body: { upsert: message.payload, doc: message.payload }
   })
 }
 
