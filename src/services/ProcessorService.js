@@ -21,7 +21,7 @@ function convertPayload (payload) {
     if (payload.createdAt) {
       payload.createdAt = moment(payload.createdAt).valueOf()
     } else {
-      payload.createdAt = moment().valueOf()
+      delete payload.createdAt
     }
   }
 
@@ -29,7 +29,7 @@ function convertPayload (payload) {
     if (payload.updatedAt) {
       payload.updatedAt = moment(payload.updatedAt).valueOf()
     } else {
-      payload.updatedAt = moment().valueOf()
+      delete payload.updatedAt
     }
   }
 
@@ -37,7 +37,7 @@ function convertPayload (payload) {
     if (payload.emailVerifyTokenDate) {
       payload.emailVerifyTokenDate = moment(payload.emailVerifyTokenDate).valueOf()
     } else {
-      payload.emailVerifyTokenDate = moment().valueOf()
+      delete payload.emailVerifyTokenDate
     }
   }
 
@@ -45,7 +45,7 @@ function convertPayload (payload) {
     if (payload.newEmailVerifyTokenDate) {
       payload.newEmailVerifyTokenDate = moment(payload.newEmailVerifyTokenDate).valueOf()
     } else {
-      payload.newEmailVerifyTokenDate = moment().valueOf()
+      delete payload.newEmailVerifyTokenDate
     }
   }
 
