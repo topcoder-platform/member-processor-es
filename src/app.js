@@ -48,26 +48,11 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (
           yield ProcessorService.updateProfile(messageJSON)
         }
         break
-      case config.UPDATE_PROFILE_TOPIC:
-        yield ProcessorService.updateProfile(messageJSON)
-        break
       case config.DELETE_PROFILE_TOPIC:
         yield ProcessorService.removeProfile(messageJSON)
         break
-      case config.CREATE_TRAIT_TOPIC:
-        yield ProcessorService.createTrait(messageJSON)
-        break
-      case config.UPDATE_TRAIT_TOPIC:
-        yield ProcessorService.updateTrait(messageJSON)
-        break
-      case config.DELETE_TRAIT_TOPIC:
-        yield ProcessorService.removeTrait(messageJSON)
-        break
       case config.CREATE_PHOTO_TOPIC:
         yield ProcessorService.createPhoto(messageJSON)
-        break
-      case config.UPDATE_PHOTO_TOPIC:
-        yield ProcessorService.updatePhoto(messageJSON)
         break
       default:
         throw new Error(`Invalid topic: ${topic}`)
@@ -97,9 +82,8 @@ consumer
   .then(() => {
     healthcheck.init([check])
 
-    const topics = [config.CREATE_PROFILE_TOPIC, config.UPDATE_PROFILE_TOPIC, config.DELETE_PROFILE_TOPIC,
-      config.CREATE_TRAIT_TOPIC, config.UPDATE_TRAIT_TOPIC, config.DELETE_TRAIT_TOPIC,
-      config.CREATE_PHOTO_TOPIC, config.UPDATE_PHOTO_TOPIC]
+    const topics = [config.CREATE_PROFILE_TOPIC, config.DELETE_PROFILE_TOPIC,
+      config.CREATE_PHOTO_TOPIC]
     _.each(topics, (tp) => consumer.subscribe(tp, { time: Kafka.LATEST_OFFSET }, dataHandler))
   })
   .catch((err) => logger.error(err))
