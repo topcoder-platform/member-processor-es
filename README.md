@@ -21,13 +21,8 @@ The following parameters can be set in config files or in env variables:
     if not provided, then SSL connection is not used, direct insecure connection is used;
     if provided, it can be either path to private key file or private key content
 - CREATE_PROFILE_TOPIC: create profile Kafka topic, default value is 'member.action.profile.create'
-- UPDATE_PROFILE_TOPIC: update profile Kafka topic, default value is 'member.action.profile.update'
 - DELETE_PROFILE_TOPIC: delete profile Kafka topic, default value is 'member.action.profile.delete'
-- CREATE_TRAIT_TOPIC: create trait Kafka topic, default value is 'member.action.profile.trait.create'
-- UPDATE_TRAIT_TOPIC: update trait Kafka topic, default value is 'member.action.profile.trait.update'
-- DELETE_TRAIT_TOPIC: delete trait Kafka topic, default value is 'member.action.profile.trait.delete'
 - CREATE_PHOTO_TOPIC: create photo Kafka topic, default value is 'member.action.profile.photo.create'
-- UPDATE_PHOTO_TOPIC: update photo Kafka topic, default value is 'member.action.profile.photo.update'
 - esConfig: ElasticSearch config
 
 Refer to `esConfig` variable in `config/default.js` for ES related configuration.
@@ -51,13 +46,8 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 - note that the zookeeper server is at localhost:2181, and Kafka server is at localhost:9092
 - use another terminal, go to same directory, create some topics:
   `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.create`
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.update`
   `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.delete`
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.trait.create`
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.trait.update`
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.trait.delete`
   `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.photo.create`
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic member.action.profile.photo.update`
 - verify that the topics are created:
   `bin/kafka-topics.sh --list --zookeeper localhost:2181`,
   it should list out the created topics
@@ -169,12 +159,6 @@ info: {
   `{ "topic": "member.action.profile.create", "originator": "member-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "user-id": "1111", "userHandle": "handle", "sex": "male", "created": "2018-01-02T00:00:00", "createdBy": "admin" } }`
 - then in the app console, you will see error message
 
-- start kafka-console-producer to write messages to `member.action.profile.update` topic:
-  `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic member.action.profile.update`
-- write message:
-  `{ "topic": "member.action.profile.update", "originator": "member-api", "timestamp": "2018-03-02T00:00:00", "mime-type": "application/json", "payload": { "userId": 1111, "email": "updated@test.com", "sex": "male", "createdAt": "2018-01-02T00:00:00", "createdBy": "admin", "updatedAt": "2018-03-02T00:00:00", "updatedBy": "admin" } }`
-- run command `npm run view-data 1111` to view the updated data, you will see the data are properly updated:
-
 ```bash
 info: Elasticsearch data:
 info: {
@@ -197,20 +181,10 @@ info: The data is not found.
 ```
 
 - management of other data are similar, below gives valid Kafka messages for other resource types, so that you may test them easily
-- create trait:
-  ` {"topic":"member.action.profile.trait.create","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:39:37.360Z","payload":{"userId":132456,"lastName":"Kranitsas","addresses":[{"streetAddr1":"address 1","streetAddr2":"address 2","city":"city","zip":"121212","stateCode":"code","type":"HOME","updatedAt":null,"createdAt":null,"createdBy":null,"updatedBy":null}],"updatedBy":"132456","description":"des","homeCountryCode":null,"handle":"heffan","otherLangName":"NIAL","handleLower":"heffan","emailVerifyTokenDate":null,"tracks":["DATA_SCIENCE","DEVELOP"],"firstName":"Thomas","photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","createdAt":"2018-10-12T11:07:02.231Z","createdBy":"132456","emailVerifyToken":null,"maxRating":null,"newEmail":null,"competitionCountryCode":"USA","email":"heffanNew@email.com","status":"ACTIVE","updatedAt":"2018-10-12T11:39:37.323Z","traits":[{"traitId":"basic_info","data":[{"shortBio":"There is no great genius without some touch of madness.","gender":"Male","tshirtSize":"L","country":"Greece","primaryInterestInTopcoder":"Copiloting!","birthDate":"1994-04-10T10:10:11.000Z","currentLocation":"test place"}]}]}}`
-- update trait:
-  `{"topic":"member.action.profile.trait.update","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:40:24.002Z","payload":{"userId":132456,"lastName":"Kranitsas","addresses":[{"streetAddr1":"address 1","streetAddr2":"address 2","city":"city","zip":"121212","stateCode":"code","type":"HOME","updatedAt":null,"createdAt":null,"createdBy":null,"updatedBy":null}],"updatedBy":"132456","description":"des","homeCountryCode":null,"handle":"heffan","otherLangName":"NIAL update","handleLower":"heffan","emailVerifyTokenDate":null,"tracks":["DATA_SCIENCE","DEVELOP"],"firstName":"Thomas","photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","createdAt":"2018-10-12T11:07:02.231Z","createdBy":"132456","emailVerifyToken":null,"maxRating":null,"newEmail":null,"competitionCountryCode":"USA","email":"heffanNew@email.com","status":"ACTIVE","updatedAt":"2018-10-12T11:40:23.966Z","traits":[{"traitId":"basic_info","data":[{"shortBio":"There is no great genius without some touch of madness. update............","gender":"Male","tshirtSize":"L","country":"Greece","primaryInterestInTopcoder":"Copiloting!","birthDate":"1994-04-10T10:10:11.000Z","currentLocation":"test place","email":"heffanNew@email.com"}]}]}}`
-- delete trait:
-  `{ "topic": "{"topic":"member.action.profile.trait.delete","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:41:02.341Z","payload":{"userId":132456,"memberProfileTraitIds":["basic_info"],"updatedAt":"2018-10-12T11:41:02.341Z","updatedBy":"132456"}}`
 - create photo:
   ` {"topic":"member.action.profile.photo.create","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:42:10.186Z","payload":{"userId":132456,"photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","updatedAt":"2018-10-12T11:42:10.173Z","updatedBy":"132456"}}`
-- update photo:
-  ` {"topic":"member.action.profile.photo.update","mime-type":"application/json","originator":"ap-member-microservices","timestamp":"2018-10-12T11:42:10.186Z","payload":{"userId":132456,"photoURL":"https://topcoder-prod-media.s3.amazonaws.com/member/profile/heffan-12345.jpeg","updatedAt":"2018-10-12T11:42:10.173Z","updatedBy":"132456"}}`
 
 - to view photo data, run command `npm run view-data 1111`
-- to view trait data, run command `npm run view-data 1111`
-
 
 ## Notes
 - the processor will add resource field (profile/photo/trait) to the message payload to be indexed in ElasticSearch,

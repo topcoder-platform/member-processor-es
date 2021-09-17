@@ -49,16 +49,6 @@ describe('TC Member Processor Tests', () => {
       .catch(done)
   }).timeout(TEST_TIMEOUT_MS)
 
-  it('update profile message', (done) => {
-    co(function * () {
-      yield ProcessorService.updateProfile(updateProfileMessage)
-      const data = yield testHelper.getESData(updateProfileMessage.payload.userId)
-      testHelper.expectObject(data, updateProfileMessage.payload)
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
   it('delete profile message', (done) => {
     co(function * () {
       yield ProcessorService.removeProfile(deleteProfileMessage)
@@ -141,40 +131,6 @@ describe('TC Member Processor Tests', () => {
       .catch(done)
   }).timeout(TEST_TIMEOUT_MS)
 
-  it('update profile message - invalid parameters, missing payload', (done) => {
-    const message = _.cloneDeep(updateProfileMessage)
-    delete message.payload
-    co(function * () {
-      try {
-        yield ProcessorService.updateProfile(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update profile message - invalid parameters, invalid timestamp', (done) => {
-    const message = _.cloneDeep(updateProfileMessage)
-    message.timestamp = 'abc'
-    co(function * () {
-      try {
-        yield ProcessorService.updateProfile(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
   it('delete profile message - invalid parameters, invalid payload userId', (done) => {
     const message = _.cloneDeep(deleteProfileMessage)
     message.payload.userId = { test: 123 }
@@ -198,125 +154,6 @@ describe('TC Member Processor Tests', () => {
     co(function * () {
       try {
         yield ProcessorService.removeProfile(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('create trait message - invalid parameters, missing originator', (done) => {
-    const message = _.cloneDeep(createTraitMessage)
-    delete message.originator
-    co(function * () {
-      try {
-        yield ProcessorService.createTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('create trait message - invalid parameters, wrong mime-type', (done) => {
-    const message = _.cloneDeep(createTraitMessage)
-    message['mime-type'] = 123
-    co(function * () {
-      try {
-        yield ProcessorService.createTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update trait message - invalid parameters, missing payload', (done) => {
-    const message = _.cloneDeep(updateTraitMessage)
-    delete message.payload
-    co(function * () {
-      try {
-        yield ProcessorService.updateTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update trait message - invalid parameters, invalid timestamp', (done) => {
-    const message = _.cloneDeep(updateTraitMessage)
-    message.timestamp = 'abc'
-    co(function * () {
-      try {
-        yield ProcessorService.updateTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('delete trait message - invalid parameters, invalid payload userId', (done) => {
-    const message = _.cloneDeep(deleteTraitMessage)
-    message.payload.userId = { test: 123 }
-    co(function * () {
-      try {
-        yield ProcessorService.removeTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('delete trait message - invalid parameters, invalid topic', (done) => {
-    const message = _.cloneDeep(deleteTraitMessage)
-    message.topic = [1, 2]
-    co(function * () {
-      try {
-        yield ProcessorService.removeTrait(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('delete trait message - invalid parameters, invalid trait id', (done) => {
-    const message = _.cloneDeep(deleteTraitMessage)
-    message.payload.membetProfileTraitIds = [0]
-    co(function * () {
-      try {
-        yield ProcessorService.removeTrait(message)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.name).to.equal('ValidationError')
@@ -368,57 +205,6 @@ describe('TC Member Processor Tests', () => {
     co(function * () {
       try {
         yield ProcessorService.createPhoto(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update photo message - invalid parameters, missing payload', (done) => {
-    const message = _.cloneDeep(updatePhotoMessage)
-    delete message.payload
-    co(function * () {
-      try {
-        yield ProcessorService.updatePhoto(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update photo message - invalid parameters, missing payload photoURL', (done) => {
-    const message = _.cloneDeep(updatePhotoMessage)
-    delete message.payload.photoURL
-    co(function * () {
-      try {
-        yield ProcessorService.updatePhoto(message)
-      } catch (err) {
-        expect(err).to.exist // eslint-disable-line
-        expect(err.name).to.equal('ValidationError')
-        return
-      }
-      throw new Error('There should be validation error.')
-    })
-      .then(() => done())
-      .catch(done)
-  }).timeout(TEST_TIMEOUT_MS)
-
-  it('update photo message - invalid parameters, invalid payload photoURL', (done) => {
-    const message = _.cloneDeep(updatePhotoMessage)
-    message.payload.photoURL = 'abc.png'
-    co(function * () {
-      try {
-        yield ProcessorService.updatePhoto(message)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.name).to.equal('ValidationError')

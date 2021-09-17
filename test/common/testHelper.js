@@ -41,11 +41,11 @@ function * removeESData (id) {
  */
 function expectObject (target, expected) {
   _.forIn(expected, (value, key) => {
-	if (target[key] instanceof Array) {
+    if (target[key] instanceof Array) {
       expect(target[key].length).to.equal(value.length)
-	} else {
+    } else {
 	  expect(target[key]).to.equal(value)
-	}    
+    }
   })
 }
 

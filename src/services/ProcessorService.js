@@ -7,7 +7,6 @@ const Joi = require('joi')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
 const config = require('config')
-const { PROFILE_RESOURCE, TRAIT_RESOURCE, PHOTO_RESOURCE } = require('../constants')
 
 const client = helper.getESClient()
 
@@ -51,17 +50,17 @@ function convertPayload (payload) {
 
   if (payload.hasOwnProperty('traits')) {
     if (payload.traits.hasOwnProperty('data')) {
-      payload.traits.data.forEach(function(element) {
+      payload.traits.data.forEach(function (element) {
         if (element.hasOwnProperty('birthDate')) {
           element.birthDate = moment(element.birthDate).valueOf()
         }
         if (element.hasOwnProperty('timePeriodFrom')) {
-          console.log("Time Period From - " + element.timePeriodFrom);
+          console.log('Time Period From - ' + element.timePeriodFrom)
           if (element.timePeriodFrom) {
-            console.log("Time Period Converted - " + moment(element.timePeriodFrom).valueOf());
+            console.log('Time Period Converted - ' + moment(element.timePeriodFrom).valueOf())
             element.timePeriodFrom = moment(element.timePeriodFrom).valueOf()
           } else {
-            console.log("Null");
+            console.log('Null')
             element.timePeriodFrom = null
           }
         }
@@ -72,19 +71,19 @@ function convertPayload (payload) {
             element.timePeriodTo = null
           }
         }
-      });
+      })
     }
   } else {
     payload.handleSuggest = {
       input: payload.handle,
       output: payload.handle,
       payload: {
-          handle: payload.handle,
-          userId: payload.userId.toString(),
-          id: payload.userId.toString(),
-          photoURL: payload.photoURL,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
+        handle: payload.handle,
+        userId: payload.userId.toString(),
+        id: payload.userId.toString(),
+        photoURL: payload.photoURL,
+        firstName: payload.firstName,
+        lastName: payload.lastName
       }
     }
   }
@@ -143,13 +142,13 @@ function * createProfile (message) {
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_PROFILE_TYPE'),
     id: message.payload.userId
-  });
-  
-  if(exists) {
-    console.log("ES Updated for " + message.payload.userId);
+  })
+
+  if (exists) {
+    console.log('ES Updated for ' + message.payload.userId)
     yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
   } else {
-    console.log("ES Created for " + message.payload.userId);
+    console.log('ES Created for ' + message.payload.userId)
     yield create(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
   }
 }
@@ -197,64 +196,6 @@ removeProfile.schema = {
 }
 
 /**
- * Create trait message in Elasticsearch.
- * @param {Object} message the message
- */
-function * createTrait (message) {
-  yield create(`${message.payload.userId}${message.payload.traits.traitId}`, `${config.get('esConfig.ES_PROFILE_TRAIT_TYPE')}`, message)
-}
-
-createTrait.schema = {
-  message: Joi.object().keys({
-    topic: Joi.string().required(),
-    originator: Joi.string().required(),
-    timestamp: Joi.date().required(),
-    'mime-type': Joi.string().required(),
-    payload: Joi.object().keys({
-      userId: Joi.number().integer().min(1).required(),
-      traits: Joi.object().keys({
-        traitId: Joi.string().required(),
-        data: Joi.array().required()
-      })
-    }).unknown(true).required()
-  }).required()
-}
-
-/**
- * Update trait message in Elasticsearch.
- * @param {Object} message the message
- */
-function * updateTrait (message) {
-  yield update(`${message.payload.userId}${message.payload.traits.traitId}`, `${config.get('esConfig.ES_PROFILE_TRAIT_TYPE')}`, message)
-}
-
-updateTrait.schema = createTrait.schema
-
-/**
- * Remove trait message in Elasticsearch.
- * @param {Object} message the message
- */
-function * removeTrait (message) {
-  yield remove(_.map(message.payload.memberProfileTraitIds, (traitId) =>
-    `${message.payload.userId}${traitId}`), `${config.get('esConfig.ES_PROFILE_TRAIT_TYPE')}`)
-}
-
-removeTrait.schema = {
-  message: Joi.object().keys({
-    topic: Joi.string().required(),
-    originator: Joi.string().required(),
-    timestamp: Joi.date().required(),
-    'mime-type': Joi.string().required(),
-    payload: Joi.object().keys({
-      userId: Joi.number().integer().min(1).required(),
-      memberProfileTraitIds: Joi.array().items().min(1).required(),
-      updatedBy: Joi.string(),
-      updatedAt: Joi.string()
-    }).required()
-  }).required()
-}
-
-/**
  * Create photo message in Elasticsearch.
  * @param {Object} message the message
  */
@@ -275,26 +216,12 @@ createPhoto.schema = {
   }).required()
 }
 
-/**
- * Update photo message in Elasticsearch.
- * @param {Object} message the message
- */
-function * updatePhoto (message) {
-  yield update(`${message.payload.userId}`, `${config.get('esConfig.ES_PROFILE_TYPE')}`, message)
-}
-
-updatePhoto.schema = createPhoto.schema
-
 // Exports
 module.exports = {
   createProfile,
   updateProfile,
   removeProfile,
-  createTrait,
-  updateTrait,
-  removeTrait,
-  createPhoto,
-  updatePhoto
+  createPhoto
 }
 
 logger.buildService(module.exports)
