@@ -75,7 +75,7 @@ workflows:
           context : org-global
           filters:
             branches:
-              only: [ "develop", "dev-circleci" ]
+              only: [ "develop", "feature/shapeup4-cqrs-standards-update" ]
       - "build-prod":
           context : org-global
           filters:
