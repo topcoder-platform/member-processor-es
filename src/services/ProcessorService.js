@@ -102,7 +102,8 @@ function * create (id, type, message) {
     index: config.get('esConfig.ES_INDEX'),
     type: type,
     id,
-    body: convertPayload(message.payload)
+    body: convertPayload(message.payload),
+    refresh: 'true',
   })
 }
 
@@ -117,7 +118,8 @@ function * update (id, type, message) {
     index: config.get('esConfig.ES_INDEX'),
     type: type,
     id,
-    body: { upsert: message.payload, doc: message.payload }
+    body: { upsert: message.payload, doc: message.payload },
+    refresh: 'true'
   })
 }
 
@@ -130,7 +132,8 @@ function * remove (ids, type) {
   yield _.map(ids, (id) => client.delete({
     index: config.get('esConfig.ES_INDEX'),
     type: type,
-    id
+    id,
+    refresh: 'true'
   }))
 }
 
@@ -142,7 +145,8 @@ function * createProfile (message) {
   const exists = yield client.exists({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_PROFILE_TYPE'),
-    id: message.payload.userId
+    id: message.payload.userId,
+    refresh: true
   });
   
   if(exists) {
