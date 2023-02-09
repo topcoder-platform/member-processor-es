@@ -43,7 +43,7 @@ jobs:
             source buildenvvar
             ./master_deploy.sh -d ECS -e DEV -t latest -s member-processor-es_appvar -i member-processor-es
             
-   "build-qa":
+  "build-qa":
     <<: *defaults
     steps:
       # Initialization.
