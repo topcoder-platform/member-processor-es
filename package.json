@@ -18,10 +18,10 @@
   "license": "none",
   "devDependencies": {
     "chai": "^4.1.1",
-    "mocha": "^3.5.0",
+    "mocha": "^10.2.0",
     "mocha-prepare": "^0.1.0",
     "nock": "^9.4.4",
-    "nyc": "^12.0.2",
+    "nyc": "^15.1.0",
     "standard": "^11.0.1"
   },
   "dependencies": {
