@@ -14,7 +14,7 @@ install_dependency: &install_dependency
             sudo chmod +x /usr/local/bin/ecs-cli            
             
 install_deploysuite: &install_deploysuite
-          name: Installation of install_deploysuite.
+          name: Installation of install_deploysuite
           command: |
             git clone --branch v1.4.15 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deploy.sh .
