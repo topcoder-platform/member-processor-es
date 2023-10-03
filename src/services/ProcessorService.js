@@ -74,7 +74,7 @@ function convertPayload (payload) {
         }
       });
     }
-  } else {
+  } else if (payload.hasOwnProperty('handle')) {
     payload.handleSuggest = {
       input: payload.handle,
       output: payload.handle,
