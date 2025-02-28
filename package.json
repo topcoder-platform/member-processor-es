@@ -25,7 +25,7 @@
     "standard": "^11.0.1"
   },
   "dependencies": {
-    "aws-sdk": "^2.286.2",
+    "aws-sdk": "^2.814.0",
     "bluebird": "^3.5.1",
     "co": "^4.6.0",
     "config": "^1.21.0",
